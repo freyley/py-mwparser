@@ -68,7 +68,7 @@ class WikiMarkup:
         self.link_prefix = prefix
     
     def find_references(self, pull=False):
-        ref_re = r'<ref.*</ref>'
+        ref_re = r'<ref.+?</ref>'
         results = re.findall(ref_re, self.s)
         if pull:
             self.s = re.sub(ref_re, '', self.s)
