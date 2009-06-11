@@ -115,6 +115,10 @@ class MWParserTests(unittest.TestCase):
         got = p.render()
         self.assertEqual('<p>foobar <a href="http://www.google.com/?q=Woo">Woo</a></p>', got)
 
+    def testNamedLinks(self):
+        self.checkMarkup('[[English People|English]]', '<p><a href="English People">English</a></p>')
+
+
     def checkMarkup(self, markup, wanted):
         p = WikiMarkup(markup)
         got = p.render()
