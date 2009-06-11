@@ -10,8 +10,8 @@ def find_lists(start_marker, tag, para):
     otherwise return (formatted_line, unformatted_remainder) '''
     unformatted_remainder = ''
     ret = ''
-    assert('<' not in tag and '>' not in tag, "sample tag is 'ol'")
-    assert(len(start_marker) == 1, "This code assumes start_marker's length is 1")
+    assert '<' not in tag and '>' not in tag, "sample tag is 'ol'"
+    assert len(start_marker) == 1, "This code assumes start_marker's length is 1"
     # look for a list
     if para.strip() and para[0] == start_marker:
         # then it's a list entry
@@ -58,21 +58,30 @@ def chomp_equals(s):
     return (equals, chomped.strip())
 
 class WikiMarkup:
+    urlregex = r"http://([\w./+\-=&#~?]*)"
+    
     def __init__(self, s = ''):
-        s = s.replace('<', '\0&lt;\0') # Padded with \0 to prevent
-        s = s.replace('>', '\0&gt;\0') # their accidental splitting.
-        # FIXME: Evil.  I should be creating a DOM or something.
+        self.link_prefix = ''
+        self.set_markup(s)
+    
+    def set_link_prefix(self, prefix):
+        self.link_prefix = prefix
+    
+    def find_references(self, pull=False):
+        pass
+
+    def _replace_angle_brackets(self):
+        self.s = self.s.replace('<', '\0&lt;\0') # Padded with \0 to prevent
+        self.s = self.s.replace('>', '\0&gt;\0') # their accidental splitting.
+    def set_markup(self, s):
         if type(s) == unicode:
             self.s = s
         else:
             self.s = unicode(s, 'utf-8')
-    def set_link_prefix(self, prefix):
-        pass
-    def find_references(self, pull=False):
-        pass
-
+        
     def render(self):
-        urlregex = r"http://([\w./+\-=&#~?]*)"
+        self._replace_angle_brackets()
+
         ret = ""
         paragraphs = re.split(r'\n', self.s) # That's right, eat that whitespace
         while paragraphs:
@@ -103,19 +112,19 @@ class WikiMarkup:
             # First look for ]]
             subsplitted = para.split(']]')
             for subelt in subsplitted:
-                internal = re.sub(r"\[\[(.*)", r'<a href="\1">\1</a>', subelt)
+                internal = re.sub(r"\[\[(.*)", r'<a href="%s\1">\1</a>' % self.link_prefix, subelt)
                 if internal != subelt:
                     newpara += internal
                 else:
                     splitted = subelt.split(']')
                     # Run regex sub on elements
-                    namedlinkre = r'\[' + urlregex + ' ' + r'(.+)'
+                    namedlinkre = r'\[' + self.urlregex + ' ' + r'(.+)'
                     for elt in splitted:
                         named = re.sub(namedlinkre, r'<a href="http://\1">\2</a>', elt)
                         if named != elt:
                             newpara += named
                         else: # if no change
-                            linked = re.sub(urlregex, r'<a href="http://\1">http://\1</a>', elt)
+                            linked = re.sub(self.urlregex, r'<a href="http://\1">http://\1</a>', elt)
                             newpara += linked
                             if not (elt is splitted[-1]): # FIXME: "is" check is wrong for ''
                                 newpara += ']'

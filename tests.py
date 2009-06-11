@@ -108,12 +108,12 @@ class MWParserTests(unittest.TestCase):
         got = p.render()
         self.assertEqual('Something over', got)
 
-    def testLinkSettingsForBrackets(self):
-        markup = 'foobar [Woo]'
+    def testLinkPrefixRendering(self):
+        markup = 'foobar [[Woo]]'
         p = WikiMarkup(markup)
-        p.set_link_prefix('http://www.google.com/?q=%s')
+        p.set_link_prefix('http://www.google.com/?q=')
         got = p.render()
-        self.assertEqual('foobar <a href="http://www.google.com/?q=Woo">Woo</a>', got)
+        self.assertEqual('<p>foobar <a href="http://www.google.com/?q=Woo">Woo</a></p>', got)
 
     def checkMarkup(self, markup, wanted):
         p = WikiMarkup(markup)
@@ -123,6 +123,5 @@ class MWParserTests(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    t
     unittest.main()
     
