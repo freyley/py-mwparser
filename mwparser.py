@@ -68,7 +68,11 @@ class WikiMarkup:
         self.link_prefix = prefix
     
     def find_references(self, pull=False):
-        pass
+        ref_re = r'<ref.*</ref>'
+        results = re.findall(ref_re, self.s)
+        if pull:
+            self.s = re.sub(ref_re, '', self.s)
+        return results
 
     def _replace_angle_brackets(self):
         self.s = self.s.replace('<', '\0&lt;\0') # Padded with \0 to prevent

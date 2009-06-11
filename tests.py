@@ -106,7 +106,7 @@ class MWParserTests(unittest.TestCase):
         ref = p.find_references(pull = True)
         self.assertEqual(ref, ['<ref name="foo">Something where</ref>'])
         got = p.render()
-        self.assertEqual('Something over', got)
+        self.assertEqual('<p>Something over</p>', got)
 
     def testLinkPrefixRendering(self):
         markup = 'foobar [[Woo]]'
